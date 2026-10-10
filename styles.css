@@ -1,0 +1,149 @@
+/* 无边 · 寒江独钓 —— 纸上只留一叶舟 */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* 安全区（刘海、圆角、Home 指示条）＋ 统一的页边距 */
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --edge: clamp(18px, 3vw, 40px);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #e6dfcc;
+  color: #1c1915;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+body { position: fixed; inset: 0; }
+
+#c {
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  touch-action: none;           /* 轻触、轻扫都交给画布自己处理：不缩放、不回弹、不下拉刷新 */
+  cursor: default;
+  outline: none;
+}
+
+.title {
+  position: fixed;
+  top: max(clamp(20px, 4.2vh, 40px), calc(var(--sat) + 12px));
+  left: max(var(--edge), calc(var(--sal) + 14px));
+  writing-mode: vertical-rl;
+  font-size: clamp(14px, min(1.15vw, 2.1vh), 17px);
+  font-weight: 400;
+  letter-spacing: 0.55em;
+  color: rgba(28, 25, 21, 0.74);
+  pointer-events: none;
+}
+
+/* 小印：位置与大小随屏幕，避开安全区 */
+.seal {
+  position: fixed;
+  width: clamp(17px, 1.6vmin + 12px, 32px);
+  height: clamp(17px, 1.6vmin + 12px, 32px);
+  right: max(calc(6.7vw - 12px), calc(var(--sar) + 18px));
+  bottom: max(calc(17vh - 14px), calc(var(--sab) + 56px));
+  bottom: max(calc(17dvh - 14px), calc(var(--sab) + 56px));
+  opacity: 0.88;
+  pointer-events: none;
+}
+
+.hint {
+  position: fixed;
+  left: 50%;
+  bottom: max(24px, calc(var(--sab) + 14px));
+  transform: translateX(-50%);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  white-space: nowrap;
+  color: rgba(28, 25, 21, 0.34);
+  pointer-events: none;
+  transition: opacity 2.4s ease;
+}
+.hint .t { display: none; }
+@media (hover: none) and (pointer: coarse) {
+  .hint .k { display: none; }
+  .hint .t { display: inline; }
+}
+body.moved .hint { opacity: 0; }
+
+.poem {
+  position: fixed;
+  top: max(15vh, calc(var(--sat) + 24px));
+  right: calc(clamp(48px, 12vw, 220px) + var(--sar));
+  writing-mode: vertical-rl;
+  font-size: clamp(13px, min(1.25vw, 2.2vh), 19px);
+  line-height: 2.6;
+  letter-spacing: 0.7em;
+  color: #1c1915;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 4.5s ease;
+}
+.poem.on { opacity: 0.22; }
+.poem.quick { transition-duration: 1.2s; }
+
+.legacy {
+  position: fixed;
+  left: max(var(--edge), calc(var(--sal) + 14px));
+  bottom: max(20px, calc(var(--sab) + 12px));
+  padding: 6px 0;                 /* 触控热区略大，字不变 */
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: rgba(28, 25, 21, 0.16);
+  text-decoration: none;
+  transition: color 0.6s ease;
+}
+.legacy:hover, .legacy:focus-visible { color: rgba(28, 25, 21, 0.5); outline: none; }
+
+/* 竖屏手机：旧作入口挪到右上，竖排；题诗略收 */
+@media (max-width: 600px) and (orientation: portrait) {
+  .legacy {
+    left: auto; bottom: auto;
+    right: max(clamp(14px, 4vw, 28px), calc(var(--sar) + 10px));
+    top: max(20px, calc(var(--sat) + 12px));
+    padding: 0 6px;
+    writing-mode: vertical-rl;
+  }
+  .poem { top: max(14vh, calc(var(--sat) + 64px)); right: calc(clamp(44px, 13vw, 64px) + var(--sar)); }
+}
+@media (orientation: portrait) {
+  .seal { bottom: max(calc(12vh - 10px), calc(var(--sab) + 56px)); bottom: max(calc(12dvh - 10px), calc(var(--sab) + 56px)); }
+}
+/* 竖屏平板：题诗字随宽 */
+@media (orientation: portrait) and (min-width: 601px) {
+  .poem { font-size: clamp(14px, 1.9vw, 18px); top: 13vh; }
+}
+/* 横屏手机（矮屏）：一切更收敛 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .title { letter-spacing: 0.45em; }
+  .hint { letter-spacing: 0.24em; font-size: 10px; }
+  .hint .lr { display: none; }
+  .poem { top: max(12vh, calc(var(--sat) + 16px)); line-height: 2.3; letter-spacing: 0.5em; }
+  .seal { bottom: max(calc(17vh - 14px), calc(var(--sab) + 40px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint, .poem, .legacy { transition-duration: 0.8s; }
+}
+
+/* 竖排时「3D」横着并成一格（纵中横） */
+.legacy .tcy { text-combine-upright: all; -webkit-text-combine: horizontal; }
